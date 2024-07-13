@@ -28,13 +28,9 @@ def friend_accept():
 
 @friend_bp.route("/friend/decline", methods = ["POST"])
 def friend_decline():
-    token = request.headers.get('Authorization')
-    token = token.replace("Bearer ", "")
-    payload = jwt_decode(token)
-    if payload == "TOKEN_EXPIRED":
-        return jsonify({'error': "TOKEN_EXPIRED"})
-    if payload == "INVALID_TOKEN":
-        return jsonify({'error': 'INVALID_TOKEN'})
+    data, code = check_token(request.headers)
+    if code == 401:
+        return jsonify(data), code
     if request.method == "POST":
         return decline(request.args.get("id"))
 
