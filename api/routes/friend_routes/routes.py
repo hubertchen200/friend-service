@@ -1,11 +1,11 @@
 from . import friend_bp
 from flask import request, jsonify
 from api.friend import get_request, send_request, accept, decline
-from api.jwt_token.my_jwt import check_token
+from hubertchen_package import my_jwt
 
 @friend_bp.route('/friend/request', methods = ["GET", "POST"])
 def my_friend():
-    data, code = check_token(request.headers)
+    data, code = my_jwt.check_token(request.headers)
     if code == 401:
         return jsonify(data), code
     if request.method == "GET":
@@ -19,7 +19,7 @@ def my_friend():
 
 @friend_bp.route("/friend/accept", methods = ["POST"])
 def friend_accept():
-    data, code = check_token(request.headers)
+    data, code = my_jwt.check_token(request.headers)
     if code == 401:
         return jsonify(data), code
     if request.method == "POST":
@@ -28,7 +28,7 @@ def friend_accept():
 
 @friend_bp.route("/friend/decline", methods = ["POST"])
 def friend_decline():
-    data, code = check_token(request.headers)
+    data, code = my_jwt.check_token(request.headers)
     if code == 401:
         return jsonify(data), code
     if request.method == "POST":
