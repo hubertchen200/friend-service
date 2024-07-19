@@ -9,7 +9,7 @@ def get_friend(user_id):
         cursor = conn.cursor()
         select_query = "select * from friends where user1 = %s"
         select_data = (user_id,)
-        cursor.execute(select_query, select_query)
+        cursor.execute(select_query, select_data)
         rows = cursor.fetchall()
         friends = []
         for row in rows:
