@@ -3,6 +3,26 @@ from flask import jsonify
 import json
 import datetime
 
+def get_friend(user_id):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        select_query = "select * from friends where user1 = %s"
+        select_data = (user_id,)
+        cursor.execute(select_query, select_query)
+        rows = cursor.fetchall()
+        friends = []
+        for row in rows:
+            friend = {
+                "id": row[0],
+                "user1": row[1],
+                "user2": row[2],
+                "timestamp": row[3],
+            }
+            friends.append(friend)
+        return jsonify({'status':'success', 'data': friends})
+    except Exception as e:
+        return jsonify({"error": f"message:{e}"})
 
 def get_request(user_id):
     try:

@@ -1,7 +1,17 @@
 from . import friend_bp
 from flask import request, jsonify
-from api.friend import get_request, send_request, accept, decline
+from api.friend import get_request, send_request, get_friend, accept, decline
 from hubertchen_package import my_jwt
+
+
+@friend_bp.route('/friends', methods = ["GET"])
+def my_friends():
+    data, code = my_jwt.check_token(request.headers)
+    if code == 401:
+        return jsonify(data), code
+    if request.method == "GET":
+        user_id = request.args.get('user_id')
+        return get_friend(user_id)
 
 @friend_bp.route('/friend/request', methods = ["GET", "POST"])
 def my_friend():
