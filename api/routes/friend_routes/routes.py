@@ -10,8 +10,8 @@ def my_friends():
     if code == 401:
         return jsonify(data), code
     if request.method == "GET":
-        user_id = request.args.get('user_id')
-        return get_friend(user_id)
+        username = request.args.get('username')
+        return get_friend(username)
 
 @friend_bp.route('/friend/request', methods = ["GET", "POST"])
 def my_friend():
@@ -19,11 +19,11 @@ def my_friend():
     if code == 401:
         return jsonify(data), code
     if request.method == "GET":
-        id = request.args.get("user_id", 0)
-        return get_request(id)
+        username = request.args.get("username", 0)
+        return get_request(username)
     if request.method == "POST":
         my_request = request.get_json()
-        return send_request(my_request["user_id"], my_request["friend_id"])
+        return send_request(my_request["sender"], my_request["receiver"])
 
 
 
@@ -33,7 +33,8 @@ def friend_accept():
     if code == 401:
         return jsonify(data), code
     if request.method == "POST":
-        return accept(request.args.get("id"))
+        receiver = data['data']['username']
+        return accept(request.args.get("sender"), receiver)
 
 
 @friend_bp.route("/friend/decline", methods = ["POST"])
@@ -42,7 +43,8 @@ def friend_decline():
     if code == 401:
         return jsonify(data), code
     if request.method == "POST":
-        return decline(request.args.get("id"))
+        receiver = data['data']['username']
+        return decline(request.args.get("sender"), receiver)
 
 
 

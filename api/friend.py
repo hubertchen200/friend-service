@@ -3,12 +3,12 @@ from flask import jsonify
 import json
 import datetime
 
-def get_friend(user_id):
+def get_friend(username):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        select_query = "select * from friends where user1 = %s"
-        select_data = (user_id,)
+        select_query = "select * from friends where user1 = %s or user2 = %s"
+        select_data = (username, username)
         cursor.execute(select_query, select_data)
         rows = cursor.fetchall()
         friends = []
@@ -24,12 +24,12 @@ def get_friend(user_id):
     except Exception as e:
         return jsonify({"error": f"message:{e}"})
 
-def get_request(user_id):
+def get_request(username):
     try:
         conn = get_connection()
         cursor = conn.cursor()
         select_query = 'select * from requests where receiver = %s'
-        select_data = (user_id,)
+        select_data = (username,)
         cursor.execute(select_query, select_data)
         rows = cursor.fetchall()
         requests = []
@@ -46,48 +46,55 @@ def get_request(user_id):
         print(f"failed: {e}")
         return jsonify({"error": f"message: {e}"})
 
-def send_request(user_id, friend_id):
+
+def send_request(sender, receiver):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        select_query = "select * from users where id = %s"
-        select_data = (friend_id, )
+        select_query = "select * from users where username = %s"
+        select_data = (receiver, )
         cursor.execute(select_query, select_data)
         row = cursor.fetchall()
         if len(row) == 0:
             return jsonify({"error": "failed to find friend"})
         insert_query = "insert into requests (sender, receiver) values (%s, %s)"
-        insert_data = (user_id, friend_id)
+        insert_data = (sender, receiver)
         cursor.execute(insert_query, insert_data)
         conn.commit()
-        return jsonify(insert_data), 201
+        result = {"sender": sender, "receiver": receiver}
+        return jsonify(result), 201
     except Exception as e:
         return jsonify({"error": f"message: {e}"})
 
 
-def decline(id):
+def decline(sender, receiver):
     conn = get_connection()
     cursor = conn.cursor()
-    delete_query = 'delete from requests where id = %s'
-    delete_data = (id,)
+    delete_query = 'delete from requests where sender = %s and receiver = %s'
+    delete_data = (sender, receiver)
     cursor.execute(delete_query, delete_data)
     conn.commit()
     return json.dumps({"status": "request declined success fully"})
 
 
-def accept(id):
+def accept(sender, receiver):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        insert_query = 'insert into friends (user1, user2, timestamp) values (%s, %s, %s)'
-        select_query = 'select * from requests where id = %s'
-        select_data = (id,)
+
+        select_query = 'select * from requests where sender = %s and receiver = %s'
+        select_data = (sender, receiver)
         cursor.execute(select_query, select_data)
         row = cursor.fetchall()
-        insert_data = (row[0][1],row[0][2],datetime.datetime.now())
+        if len(row) != 1:
+            return jsonify({'error': 'No friend request.'})
+
+        insert_query = 'insert into friends (user1, user2, timestamp) values (%s, %s, %s)'
+        insert_data = (sender, receiver,datetime.datetime.now())
         cursor.execute(insert_query, insert_data)
+
         delete_query = 'delete from requests where id = %s'
-        delete_data = (id,)
+        delete_data = (row[0][0],)
         cursor.execute(delete_query, delete_data)
         conn.commit()
         return jsonify({'status':'request accepted'})
