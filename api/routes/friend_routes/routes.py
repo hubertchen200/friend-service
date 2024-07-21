@@ -19,7 +19,7 @@ def my_friend():
     if code == 401:
         return jsonify(data), code
     if request.method == "GET":
-        username = request.args.get("username", 0)
+        username = request.args.get("username")
         return get_request(username)
     if request.method == "POST":
         my_request = request.get_json()
