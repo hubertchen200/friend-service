@@ -23,7 +23,10 @@ def my_friend():
         return get_request(username)
     if request.method == "POST":
         my_request = request.get_json()
-        return send_request(my_request["sender"], my_request["receiver"])
+        result = send_request(my_request["sender"], my_request["receiver"])
+        if 'error' in result.keys():
+            return jsonify(result), 400
+        return jsonify(result), 200
 
 
 

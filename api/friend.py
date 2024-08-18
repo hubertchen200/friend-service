@@ -62,9 +62,9 @@ def send_request(sender, receiver):
         cursor.execute(insert_query, insert_data)
         conn.commit()
         result = {"sender": sender, "receiver": receiver}
-        return jsonify(result), 201
+        return result
     except Exception as e:
-        return jsonify({"error": f"message: {e}"})
+        return {"error": f"message: {e}"}
 
 
 def decline(sender, receiver):
