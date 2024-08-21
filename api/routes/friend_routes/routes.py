@@ -37,8 +37,10 @@ def friend_accept():
         return jsonify(data), code
     if request.method == "POST":
         receiver = data['data']['username']
-        return accept(request.args.get("sender"), receiver)
-
+        result = accept(request.args.get("sender"), receiver)
+        if 'error' in result:
+            return jsonify(result), 400
+        return jsonify(result), 200
 
 @friend_bp.route("/friend/decline", methods = ["POST"])
 def friend_decline():

@@ -97,7 +97,7 @@ def accept(sender, receiver):
         delete_data = (row[0][0],)
         cursor.execute(delete_query, delete_data)
         conn.commit()
-        return jsonify({'status':'request accepted'})
+        return {'status':'request accepted'}
     except Exception as e:
-        return jsonify({"error": f"message: {e}"})
+        return {"error": f"message: {e}"}
 # accept(2)
